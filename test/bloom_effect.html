@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.js"></script>
+    <script src="/test/postprocessing.min.js"></script>
+    <script>
+        var scene = new THREE.Scene();
+        var fieldOfView = 75;
+        var aspectRatio = window.innerWidth / window.innerHeight;
+        var nearPlane = 0.1;
+        var farPlane = 1000;
+        var camera = new THREE.PerspectiveCamera(
+            fieldOfView, aspectRatio, nearPlane, farPlane
+        );
+        camera.position.z = 8;
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        var loader = new THREE.TextureLoader();
+        var material = new THREE.MeshLambertMaterial({
+            map: loader.load('https://s3.amazonaws.com/duhaime/blog/tsne-webgl/assets/cat.jpg')
+        });
+        var geometry = new THREE.PlaneGeometry(20, 13);
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(0, 0, 0)
+        scene.add(mesh);
+        var light = new THREE.PointLight(0xffffff, 1, 0);
+        light.position.set(1, 1, 100);
+        scene.add(light)
+        var composer = new POSTPROCESSING.EffectComposer(renderer);
+        var renderPass = new POSTPROCESSING.RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        var blendFunction, luminanceSmoothing, luminanceThreshold, kernelSize, resolutionScale;
+        var bloomEffect = new POSTPROCESSING.BloomEffect({
+            blendFunction: blendFunction,
+            luminanceThreshold: luminanceThreshold,
+            luminanceSmoothing: luminanceSmoothing,
+            kernelSize: kernelSize,
+            resolutionScale: resolutionScale
+        });
+        //var lightEffect = new POSTPROCESSING.GodRaysEffect();
+        var effectPass = new POSTPROCESSING.EffectPass(camera,
+            bloomEffect);
+        effectPass.renderToScreen = true;
+        //composer.clearPass();
+        composer.addPass(effectPass);
+        var render = function () {
+            requestAnimationFrame(render);
+            composer.render();
+        }
+        render();
+        window.addEventListener('resize', () => {
+            console.log("resize fired")
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        })
+        function changeEffect(obj) {
+            switch (obj.name) {
+                case "opacity":
+                    bloomEffect.blendMode.opacity.value = parseFloat(obj.value)
+                    break;
+                case "blendfunction":
+                    bloomEffect.blendMode.blendFunction = parseFloat(obj.value);
+                    effectPass.recompile();
+                    break;
+                case "resolutionScale":
+                    bloomEffect.blurPass.scale = parseFloat(obj.value)
+                    break;
+                case "kernelSize":
+                    bloomEffect.blurPass.kernelSize = parseFloat(obj.value)
+                    break;
+                case "luminanceThreshold":
+                    bloomEffect.luminanceMaterial.threshold = parseFloat(obj.value)
+                    break;
+                case "luminanceSmoothing":
+                    bloomEffect.luminanceMaterial.smoothing = parseFloat(obj.value)
+                    break;
+                default: console.log("This Property is not Recognized")
+            }
+        }
+        document.addEventListener('bloomChanged', (ev) => {
+            changeEffect(ev.detail)
+        })
+    </script>
+</body>
+
+</html>

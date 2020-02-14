@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+            height: 100vh;
+        }
+
+        iframe {
+            display: block;
+            border: none;
+        }
+
+        table {
+            height: 100%;
+            width: 100%;
+            display: table;
+            border-spacing: 0px;
+            border-collapse: unset;
+            border: none;
+        }
+
+        td {
+            border: none;
+            padding: 0px;
+        }
+
+
+        #pixel-granularity {
+            position: absolute;
+            top: 0%;
+            left: 0%;
+        }
+
+        #bloom {
+            background: white;
+            position: absolute;
+            top: 0%;
+            left: 0%
+        }
+
+        #DOF {
+            background: white;
+            position: absolute;
+            top: 0%;
+            left: 0%
+        }
+
+        #DOFPlus1 {
+            background: white;
+            position: absolute;
+            top: 0%;
+            left: 0%
+        }
+        #DOFPlus2 {
+            background: white;
+            position: absolute;
+            top: 0%;
+            right: 0%
+        }
+    </style>
+</head>
+<bodys>
+
+    <table>
+        <tr>
+            <td style="position:relative">
+                <input type="number" name="granularity" value="5.0" step="3" min="0" max="50" id="pixel-granularity"
+                    onchange="changePixelEffect(this.value)" />
+                <iframe height="100%" width="100%" id="pixelfilter"
+                    src="http://127.0.0.1:5500/test/pixelate_effect.html"></iframe>
+            </td>
+            <td style="position:relative">
+                <div id="bloom">
+                    <label>Opacity</label>
+                    <br>
+                    <input type="number" name="opacity" value="1" step="0.1" min="0" max="1"
+                        onchange="changeBloomEffect(this)" />
+                    <br>
+                    <label>Blend Mode</label>
+                    <br>
+                    <input type="number" name="blendfunction" value="16" step="1" min="0" max="18"
+                        onchange="changeBloomEffect(this)" />
+                    <br>
+                    <label>Scale</label>
+                    <br>
+                    <input type="number" name="resolutionScale" value="0.5" step="0.01" min="0" max="1"
+                        onchange="changeBloomEffect(this)" />
+                    <br>
+                    <label>luminanceThreshold</label>
+                    <br>
+                    <input type="number" name="luminanceThreshold" value="0.9" step="0.01" min="0" max="1"
+                        onchange="changeBloomEffect(this)" />
+                    <br>
+                    <label>luminanceSmoothing</label>
+                    <br>
+                    <input type="number" name="luminanceSmoothing" value="0.025" step="0.01" min="0" max="1"
+                        onchange="changeBloomEffect(this)" />
+                    <br>
+                    <label>kernelSize</label>
+                    <br>
+                    <input type="number" name="kernelSize" value="3" step="1" min="0" max="5"
+                        onchange="changeBloomEffect(this)" />
+                    <br>
+                </div>
+                <iframe height="100%" width="100%" id="bloomfilter"
+                    src="http://127.0.0.1:5500/test/bloom_effect.html"></iframe>
+            </td>
+        </tr>
+        <tr>
+            <td style="position:relative">
+                <div id="DOF">
+                    <label>Opacity</label>
+                    <br>
+                    <input type="number" name="opacity" value="1" step="0.1" min="0" max="1"
+                        onchange="changeDOFEffect(this)" />
+                    <br>
+                    <label>Blend Mode</label>
+                    <br>
+                    <input type="number" name="blendfunction" value="13" step="1" min="0" max="18"
+                        onchange="changeDOFEffect(this)" />
+                    <br>
+                    <label>Focus</label>
+                    <br>
+                    <input type="number" name="focus" value="0.5" step="0.01" min="0" max="1"
+                        onchange="changeDOFEffect(this)" />
+                    <br>
+                    <label>DOF</label>
+                    <br>
+                    <input type="number" name="dof" value="0.02" step="0.01" min="0" max="1"
+                        onchange="changeDOFEffect(this)" />
+                    <br>
+                    <label>Aperture</label>
+                    <br>
+                    <input type="number" name="aperture" value="0.015" step="0.001" min="0" max="0.05"
+                        onchange="changeDOFEffect(this)" />
+                    <br>
+                    <label>Blur</label>
+                    <br>
+                    <input type="number" name="maxBlur" value="1" step="0.01" min="0" max="1"
+                        onchange="changeDOFEffect(this)" />
+                    <br>
+                </div>
+                <iframe height="100%" width="100%" id="doffilter"
+                    src="http://127.0.0.1:5500/test/DOF_effect.html"></iframe>
+            </td>
+            <td style="position:relative">
+                <div id="DOFPlus1">
+                    <label>Opacity</label>
+                    <br>
+                    <input type="number" name="opacity" value="1" step="0.1" min="0" max="1"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>Blend Mode</label>
+                    <br>
+                    <input type="number" name="blendfunction" value="13" step="1" min="0" max="18"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>Focus</label>
+                    <br>
+                    <input type="number" name="focus" value="2.65" step="0.01" min="0" max="20"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>Focus Length</label>
+                    <br>
+                    <input type="number" name="focalLength" value="" step="0.01" min="0" max="35"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>fstop</label>
+                    <br>
+                    <input type="number" name="fStop" value="1.6" step="0.001" min="0" max="4"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>luminanceThreshold</label>
+                    <br>
+                    <input type="number" name="luminanceThreshold" value="0.325" step="0.01" min="0" max="1"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>luminanceGain</label>
+                    <br>
+                    <input type="number" name="luminanceGain" value="2" step="0.01" min="0" max="4"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>bias</label>
+                    <br>
+                    <input type="number" name="bias" value="-0.035" step="0.001" min="-1" max="1"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                </div>
+                <div id="DOFPlus2">
+                    <label>fringe</label>
+                    <br>
+                    <input type="number" name="fringe" value="0.1" step="0.001" min="0" max="5"
+                        onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>Blur</label>
+                    <br>
+                    <input type="number" name="maxBlur" value="2.5" step="0.001" min="0" max="5" onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>rings</label>
+                    <br>
+                    <input type="number" name="rings" value="5" step="1" min="1" max="8" onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                    <label>samples</label>
+                    <br>
+                    <input type="number" name="samples" value="5" step="1" min="1" max="8" onchange="changeDOFPlusEffect(this)" />
+                    <br>
+                </div>
+                <iframe height="100%" width="100%" id="dofplusfilter"
+                    src="http://127.0.0.1:5500/test/DOFEnhanced_effect.html"></iframe>
+            </td>
+        </tr>
+    </table>
+    <script>
+        function changeBloomEffect(val) {
+            var { name, value } = val
+            var frame = document.getElementById('bloomfilter')
+            var event = new CustomEvent('bloomChanged', { detail: { name: name, value: value } });
+            frame.contentWindow.document.dispatchEvent(event)
+        }
+        function changeDOFEffect(val) {
+            var { name, value } = val
+            var frame = document.getElementById('doffilter')
+            var event = new CustomEvent('dofChanged', { detail: { name: name, value: value } });
+            frame.contentWindow.document.dispatchEvent(event)
+        }
+        function changeDOFPlusEffect(val) {
+            var { name, value } = val
+            var frame = document.getElementById('dofplusfilter')
+            var event = new CustomEvent('dofPlusChanged', { detail: { name: name, value: value } });
+            frame.contentWindow.document.dispatchEvent(event)
+        }
+        function changePixelEffect(val) {
+            var frame = document.getElementById('pixelfilter')
+            var event = new CustomEvent('granularityChanged', { detail: val });
+            frame.contentWindow.document.dispatchEvent(event)
+        }
+        window.addEventListener('resize', () => {
+            window.onload = function () {
+                let frames = document.getElementsByTagName('iframe');
+                if (frames) {
+                    frames.forEach((frame) => {
+                        var event = new CustomEvent('resize');
+                        frame.contentWindow.document.dispatchEvent(event)
+                    })
+                } else console.log("No Iframes found")
+            }
+        })
+    </script>
+</bodys>
+
+</html>

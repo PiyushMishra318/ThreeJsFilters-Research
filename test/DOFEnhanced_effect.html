@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.js"></script>
+    <script src="/test/postprocessing.min.js"></script>
+    <script>
+        var scene = new THREE.Scene();
+        var fieldOfView = 75;
+        var aspectRatio = window.innerWidth / window.innerHeight;
+        var nearPlane = 0.1;
+        var farPlane = 1000;
+        var camera = new THREE.PerspectiveCamera(
+            fieldOfView, aspectRatio, nearPlane, farPlane
+        );
+        camera.position.z = 8;
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        var loader = new THREE.TextureLoader();
+        var material = new THREE.MeshLambertMaterial({
+            map: loader.load('https://s3.amazonaws.com/duhaime/blog/tsne-webgl/assets/cat.jpg')
+        });
+        var geometry = new THREE.PlaneGeometry(20, 13);
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(0, 0, 0)
+        scene.add(mesh);
+        var light = new THREE.PointLight(0xffffff, 1, 0);
+        light.position.set(1, 1, 100);
+        scene.add(light)
+        var composer = new POSTPROCESSING.EffectComposer(renderer);
+        var renderPass = new POSTPROCESSING.RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        var dofPlusEffect = new POSTPROCESSING.RealisticBokehEffect({
+            focus: 2.65,
+            focalLength: camera.focalLength,
+            fStop: 1.6,
+            luminanceThreshold: 0.325,
+            luminanceGain: 2.0,
+            bias: -0.35,
+            fringe: 0.1,
+            maxBlur: 2.5,
+            rings: 5,
+            samples: 5,
+        });
+        //var lightEffect = new POSTPROCESSING.GodRaysEffect();
+        var effectPass = new POSTPROCESSING.EffectPass(camera,
+            dofPlusEffect);
+        effectPass.renderToScreen = true;
+        //composer.clearPass();
+        composer.addPass(effectPass);
+        var render = function () {
+            requestAnimationFrame(render);
+            composer.render();
+        }
+        render();
+        window.addEventListener('resize', () => {
+            console.log("resize fired")
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        })
+        function changeEffect(obj) {
+            switch (obj.name) {
+                case "focus":
+                case "maxBlur":
+                case "focalLength":
+                case "fStop":
+                case "luminanceThreshold":
+                case "luminanceGain":
+                case "bias":
+                case "fringe":
+                case "maxBlur":
+                    dofPlusEffect.uniforms.get(obj.name).value = parseFloat(obj.value)
+                    break;
+                case "rings":
+                case "samples":
+                    //dofPlusEffect.uniforms.get(obj.name).value = parseFloat(obj.value)
+                    effectPass.recompile()
+                    break;
+                case "opacity":
+                    dofPlusEffect.blendMode.opacity.value = parseFloat(obj.value)
+                    break;
+                case "blendfunction":
+                    dofPlusEffect.blendMode.blendFunction = parseFloat(obj.value);
+                    effectPass.recompile();
+                    break;
+                default: console.log("This Property is not Recognized")
+            }
+        }
+        document.addEventListener('dofPlusChanged', (ev) => {
+            changeEffect(ev.detail)
+        })
+    </script>
+</body>
+
+</html>
