@@ -78,6 +78,7 @@ class App extends Component {
       <>
         <div id='canvas' />
         <div>new div added here</div>
+        <div> feature 2 changes here </div>
       </>
     );
   }
